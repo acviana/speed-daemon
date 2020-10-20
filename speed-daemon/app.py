@@ -27,15 +27,15 @@ def parse_data(df):
 def plot_timeseries(df):
     fig, axs = plt.subplots(3,1)
 
-    axs[0].plot(df["timestamp"], df["download_mbps"], '.')
+    axs[0].plot(df["timestamp"], df["download_mbps"], ".")
     axs[0].set_title("Download Speed")
     axs[0].set_ylabel("Mbps")
 
-    axs[1].plot(df["timestamp"], df["upload_mbps"], '.')
+    axs[1].plot(df["timestamp"], df["upload_mbps"], ".")
     axs[1].set_title("Upload Speed")
     axs[1].set_ylabel("Mbps")
 
-    axs[2].plot(df["timestamp"], df["ping"], '.')
+    axs[2].plot(df["timestamp"], df["ping"], ".")
     axs[2].set_title("Ping")
     axs[2].set_xlabel("Date")
     axs[2].set_ylabel("ms")
@@ -76,6 +76,7 @@ def plot_daily_boxplot(df):
 def main():
     data = load_data()
     data = parse_data(data)
+    st.text(f"Analyzing {len(data)} data points over {len(data.date.unique())} days")
     sns.set_theme()
     st.pyplot(plot_timeseries(data))
     st.pyplot(plot_daily_boxplot(data))
