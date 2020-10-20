@@ -59,15 +59,15 @@ def plot_daily_boxplot(df):
     fig, axs = plt.subplots(3,1)
 
     axs[0].set_title("Download Speed")
-    axs[0].boxplot(download_by_day)
+    axs[0].boxplot(download_by_day, flierprops={"marker":"x"})
     axs[0].set_ylabel("Mbps")
 
     axs[1].set_title("Upload Speed")
-    axs[1].boxplot(upload_by_day)
+    axs[1].boxplot(upload_by_day, flierprops={"marker":"x"})
     axs[1].set_ylabel("Mbps")
 
     axs[2].set_title("Ping")
-    axs[2].boxplot(ping_by_day)
+    axs[2].boxplot(ping_by_day, flierprops={"marker":"x"})
     axs[2].set_ylabel("ms")
 
     return fig
@@ -77,6 +77,7 @@ def main():
     data = load_data()
     data = parse_data(data)
     st.text(f"Analyzing {len(data)} data points over {len(data.date.unique())} days")
+
     sns.set_theme()
     st.pyplot(plot_timeseries(data))
     st.pyplot(plot_daily_boxplot(data))
