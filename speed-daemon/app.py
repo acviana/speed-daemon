@@ -26,6 +26,7 @@ def parse_data(df):
 
 def plot_timeseries(df):
     fig, axs = plt.subplots(3,1)
+    fig.tight_layout(pad=1.0)
 
     axs[0].plot(df["timestamp"], df["download_mbps"], ".")
     axs[0].set_title("Download Speed")
@@ -46,6 +47,7 @@ def plot_timeseries(df):
 def plot_histograms(df):
     bins = 25
     fig, axs = plt.subplots(3,2)
+    fig.tight_layout(pad=1.0)
 
     axs[0][0].hist(df["download_mbps"], bins=bins)
     axs[0][0].set_xlabel("Mbps")
@@ -85,7 +87,9 @@ def plot_daily_boxplot(df):
     ping_by_day = [
         df[df.date == date].ping for date in date_list
     ]
+
     fig, axs = plt.subplots(3,1)
+    fig.tight_layout(pad=1.0)
 
     axs[0].set_title("Download Speed")
     axs[0].boxplot(download_by_day, flierprops={"marker":"x"})
