@@ -21,6 +21,7 @@ def parse_data(df):
     df["upload_mbps"] = df["upload"] / 1000000.0
     df["timestamp"] = df["timestamp"].astype('datetime64[ns]')
     df["date"] = df.timestamp.dt.date
+    df["hour_of_day"] = df.timestamp.dt.hour
     return df
 
 
@@ -113,6 +114,14 @@ def main():
     ping_by_day = [data[data.date == date].ping for date in date_list]
     st.pyplot(plot_daily_boxplot(download_by_day, upload_by_day, ping_by_day))
 
+    # Boxplot by Day of Week
+
+    # Boxplot by Hour
+    hour_list = data.hour_of_day.unique()
+    download_by_hour = [data[data.hour_of_day == hour].download_mbps for hour in hour_list]
+    upload_by_hour = [data[data.hour_of_day == hour].upload_mbps for hour in hour_list]
+    ping_by_hour = [data[data.hour_of_day == hour].ping for hour in hour_list]
+    st.pyplot(plot_daily_boxplot(download_by_hour, upload_by_hour, ping_by_hour))
 
 if __name__ == '__main__':
     main()
