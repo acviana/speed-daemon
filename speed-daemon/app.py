@@ -78,33 +78,20 @@ def plot_histograms(df):
     return fig
 
 
-def plot_daily_boxplot(df):
-    date_list = df.date.unique()
-    download_by_day = [
-        df[df.date == date].download_mbps for date in date_list
-    ]
-
-    upload_by_day = [
-        df[df.date == date].upload_mbps for date in date_list
-    ]
-
-    ping_by_day = [
-        df[df.date == date].ping for date in date_list
-    ]
-
+def plot_daily_boxplot(download_data, upload_data, ping_data):
     fig, axs = plt.subplots(3,1)
     fig.tight_layout(pad=1.0)
 
     axs[0].set_title("Download Speed")
-    axs[0].boxplot(download_by_day, flierprops={"marker":"x"})
+    axs[0].boxplot(download_data, flierprops={"marker":"x"})
     axs[0].set_ylabel("Mbps")
 
     axs[1].set_title("Upload Speed")
-    axs[1].boxplot(upload_by_day, flierprops={"marker":"x"})
+    axs[1].boxplot(upload_data, flierprops={"marker":"x"})
     axs[1].set_ylabel("Mbps")
 
     axs[2].set_title("Ping")
-    axs[2].boxplot(ping_by_day, flierprops={"marker":"x"})
+    axs[2].boxplot(ping_data, flierprops={"marker":"x"})
     axs[2].set_ylabel("ms")
 
     return fig
@@ -113,12 +100,18 @@ def plot_daily_boxplot(df):
 def main():
     data = load_data()
     data = parse_data(data)
-    st.text(f"Analyzing {len(data)} data points over {len(data.date.unique())} days")
+    date_list = data.date.unique()
+    st.text(f"Analyzing {len(data)} data points over {len(date_list)} days")
 
     sns.set_theme()
     st.pyplot(plot_histograms(data))
     st.pyplot(plot_timeseries(data))
-    st.pyplot(plot_daily_boxplot(data))
+
+    # Boxplot Timeseries
+    download_by_day = [data[data.date == date].download_mbps for date in date_list]
+    upload_by_day = [data[data.date == date].upload_mbps for date in date_list]
+    ping_by_day = [data[data.date == date].ping for date in date_list]
+    st.pyplot(plot_daily_boxplot(download_by_day, upload_by_day, ping_by_day))
 
 
 if __name__ == '__main__':
