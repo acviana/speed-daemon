@@ -51,12 +51,16 @@ def plot_histograms(df):
 
     axs[0][0].hist(df["download_mbps"], bins=bins)
     axs[0][0].set_xlabel("Mbps")
+    axs[0][0].set_ylabel("Downloads")
+
 
     axs[1][0].hist(df["upload_mbps"], bins=bins)
     axs[1][0].set_xlabel("Mbps")
+    axs[1][0].set_ylabel("Uploads")
 
     axs[2][0].hist(df["ping"], bins=bins)
     axs[2][0].set_xlabel("ms")
+    axs[2][0].set_ylabel("Pings")
 
 
     axs[0][1].set_yscale("log")
@@ -65,7 +69,7 @@ def plot_histograms(df):
 
     axs[1][1].set_yscale("log")
     axs[1][1].hist(df["upload_mbps"], bins=bins)
-    axs[0][1].set_xlabel("Mbps")
+    axs[1][1].set_xlabel("Mbps")
 
     axs[2][1].set_yscale("log")
     axs[2][1].hist(df["ping"], bins=bins)
