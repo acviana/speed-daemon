@@ -43,6 +43,35 @@ def plot_timeseries(df):
     return fig
 
 
+def plot_histograms(df):
+    bins = 25
+    fig, axs = plt.subplots(3,2)
+
+    axs[0][0].hist(df["download_mbps"], bins=bins)
+    axs[0][0].set_xlabel("Mbps")
+
+    axs[1][0].hist(df["upload_mbps"], bins=bins)
+    axs[1][0].set_xlabel("Mbps")
+
+    axs[2][0].hist(df["ping"], bins=bins)
+    axs[2][0].set_xlabel("ms")
+
+
+    axs[0][1].set_yscale("log")
+    axs[0][1].hist(df["download_mbps"], bins=bins)
+    axs[0][1].set_xlabel("Mbps")
+
+    axs[1][1].set_yscale("log")
+    axs[1][1].hist(df["upload_mbps"], bins=bins)
+    axs[0][1].set_xlabel("Mbps")
+
+    axs[2][1].set_yscale("log")
+    axs[2][1].hist(df["ping"], bins=bins)
+    axs[2][1].set_xlabel("ms")
+
+    return fig
+
+
 def plot_daily_boxplot(df):
     date_list = df.date.unique()
     download_by_day = [
@@ -79,6 +108,7 @@ def main():
     st.text(f"Analyzing {len(data)} data points over {len(data.date.unique())} days")
 
     sns.set_theme()
+    st.pyplot(plot_histograms(data))
     st.pyplot(plot_timeseries(data))
     st.pyplot(plot_daily_boxplot(data))
 
