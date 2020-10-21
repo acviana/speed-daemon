@@ -21,6 +21,7 @@ def parse_data(df):
     df["upload_mbps"] = df["upload"] / 1000000.0
     df["timestamp"] = df["timestamp"].astype('datetime64[ns]')
     df["date"] = df.timestamp.dt.date
+    df["day_of_week"] = df.timestamp.dt.day_name()
     df["hour_of_day"] = df.timestamp.dt.hour
     return df
 
@@ -79,7 +80,7 @@ def plot_histograms(df):
     return fig
 
 
-def plot_daily_boxplot(download_data, upload_data, ping_data):
+def plot_boxplot_set(download_data, upload_data, ping_data):
     fig, axs = plt.subplots(3,1)
     fig.tight_layout(pad=1.0)
 
@@ -112,16 +113,21 @@ def main():
     download_by_day = [data[data.date == date].download_mbps for date in date_list]
     upload_by_day = [data[data.date == date].upload_mbps for date in date_list]
     ping_by_day = [data[data.date == date].ping for date in date_list]
-    st.pyplot(plot_daily_boxplot(download_by_day, upload_by_day, ping_by_day))
+    st.pyplot(plot_boxplot_set(download_by_day, upload_by_day, ping_by_day))
 
     # Boxplot by Day of Week
+    day_of_week_list = data.day_of_week.unique()
+    download_by_day_of_week = [data[data.day_of_week == day_name].download_mbps for day_name in day_of_week_list]
+    upload_by_day_of_week = [data[data.day_of_week == day_name].upload_mbps for day_name in day_of_week_list]
+    ping_by_day_of_week = [data[data.day_of_week == day_name].ping for day_name in day_of_week_list]
+    st.pyplot(plot_boxplot_set(download_by_day_of_week, upload_by_day_of_week, ping_by_day_of_week))
 
     # Boxplot by Hour
     hour_list = data.hour_of_day.unique()
     download_by_hour = [data[data.hour_of_day == hour].download_mbps for hour in hour_list]
     upload_by_hour = [data[data.hour_of_day == hour].upload_mbps for hour in hour_list]
     ping_by_hour = [data[data.hour_of_day == hour].ping for hour in hour_list]
-    st.pyplot(plot_daily_boxplot(download_by_hour, upload_by_hour, ping_by_hour))
+    st.pyplot(plot_boxplot_set(download_by_hour, upload_by_hour, ping_by_hour))
 
 if __name__ == '__main__':
     main()
