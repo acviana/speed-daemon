@@ -1,5 +1,6 @@
 import glob
 import json
+from json import JSONDecodeError
 
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -12,7 +13,11 @@ def load_data():
     df_list = []
     for filename in glob.glob("../speed-daemon/data/*.json"):
         with open(filename, "r") as f:
-            df_list.append(pd.json_normalize(json.load(f)))
+            try:
+                data = json.load(f)
+            except JSONDecodeError:
+                data = {}  # Not sure why/how this works?
+            df_list.append(pd.json_normalize(data))
     return pd.concat(df_list, ignore_index=True)
 
 
