@@ -1,3 +1,4 @@
+import datetime
 import glob
 import json
 from json import JSONDecodeError
@@ -101,11 +102,40 @@ def plot_boxplot_set(download_data, upload_data, ping_data):
     return fig
 
 
+def plot_summary(df):
+    fig, axs = plt.subplots(3, 2)
+    fig.tight_layout(pad=1.0)
+
+    axs[0][0].plot(df["timestamp"], df["download_mbps"], ".")
+    axs[0][0].set_title("Download Speed")
+    axs[0][0].set_ylabel("Mbps")
+
+    axs[1][0].plot(df["timestamp"], df["upload_mbps"], ".")
+    axs[1][0].set_title("Upload Speed")
+    axs[1][0].set_ylabel("Mbps")
+
+    axs[2][0].plot(df["timestamp"], df["ping"], ".")
+    axs[2][0].set_title("Ping")
+    axs[2][0].set_xlabel("Date")
+    axs[2][0].set_ylabel("ms")
+
+    bins = 10
+
+    axs[0][1].hist(df["download_mbps"], bins=bins, orientation="horizontal")
+    axs[1][1].hist(df["upload_mbps"], bins=bins, orientation="horizontal")
+    axs[2][1].hist(df["ping"], bins=bins, orientation="horizontal")
+
+    return fig
+
+
 def main():
     data = load_data()
     data = parse_data(data)
     date_list = data.date.unique()
     st.text(f"Analyzing {len(data)} data points over {len(date_list)} days")
+
+    today = data[data.timestamp.dt.date == datetime.datetime.today().date()]
+    st.pyplot(plot_summary(today))
 
     # Build stats datesets
     download_by_date_stats = data.download_mbps.groupby(data.timestamp.dt.date).agg(
