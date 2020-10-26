@@ -16,7 +16,10 @@ pre-commit: black build
 sync:
 	./sync.sh
 
-run:
+run-container: build
+	docker container run -p 8501:8501 -d speed-daemon:latest
+
+run-server:
 	streamlit run speed-daemon/app.py
 
 update:
