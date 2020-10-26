@@ -8,7 +8,6 @@ import seaborn as sns
 import streamlit as st
 
 
-@st.cache(allow_output_mutation=True)
 def load_data():
     df_list = []
     for filename in glob.glob("../speed-daemon/data/*.json"):
@@ -108,15 +107,30 @@ def main():
     date_list = data.date.unique()
     st.text(f"Analyzing {len(data)} data points over {len(date_list)} days")
 
+    # Build stats datesets
+    download_by_date_stats = data.download_mbps.groupby(data.timestamp.dt.date).agg(
+        ["count", "median", "mean", "std"]
+    )
+    upload_by_date_stats = data.upload_mbps.groupby(data.timestamp.dt.date).agg(
+        ["count", "median", "mean", "std"]
+    )
+    ping_by_date_stats = data.ping.groupby(data.timestamp.dt.date).agg(
+        ["count", "median", "mean", "std"]
+    )
+
+    st.table(download_by_date_stats)
+    st.table(upload_by_date_stats)
+    st.table(ping_by_date_stats)
+
     sns.set_theme()
     st.pyplot(plot_histograms(data))
     st.pyplot(plot_timeseries(data))
 
     # Boxplot Timeseries
-    download_by_day = [data[data.date == date].download_mbps for date in date_list]
-    upload_by_day = [data[data.date == date].upload_mbps for date in date_list]
-    ping_by_day = [data[data.date == date].ping for date in date_list]
-    st.pyplot(plot_boxplot_set(download_by_day, upload_by_day, ping_by_day))
+    download_by_date = [data[data.date == date].download_mbps for date in date_list]
+    upload_by_date = [data[data.date == date].upload_mbps for date in date_list]
+    ping_by_date = [data[data.date == date].ping for date in date_list]
+    st.pyplot(plot_boxplot_set(download_by_date, upload_by_date, ping_by_date))
 
     # Boxplot by Day of Week
     day_of_week_list = data.day_of_week.unique()
