@@ -105,7 +105,7 @@ def plot_boxplot_set(download_data, upload_data, ping_data):
 def plot_scatterplot(ax, x_data, y_data, mean, std, title, y_label, x_label=None):
     ax.plot(x_data, y_data, ".")
     ax.axhline(mean - std, linestyle=":")
-    ax.axhline(mean)
+    ax.axhline(mean, linestyle="--")
     ax.axhline(mean + std, linestyle=":")
     ax.set_title(title)
     ax.set_ylabel(y_label)
@@ -172,23 +172,25 @@ def main():
     data = parse_data(data)
     date_list = data.date.unique()
     st.text(f"Analyzing {len(data)} data points over {len(date_list)} days")
+    sns.set_theme()
 
-    # Today Section
+    # Today's Stats
     today = data[data.timestamp.dt.date == datetime.datetime.today().date()]
     today_stats = get_summary_stats(today)
     st.table(today_stats)
-    st.pyplot(plot_summary(today, stats=today_stats))
+    st.pyplot(plot_summary(df=today, stats=today_stats))
+
+
+    # Overall Stats
+    overall_stats = get_summary_stats(data)
+    st.pyplot(plot_summary(df=data, stats=overall_stats))
+    st.pyplot(plot_histograms(data))
+
 
     daily_stats = get_summary_stats(data.groupby(data.timestamp.dt.date))
-
-    # Next Section
-    st.table(daily_stats["download_mbps"])
-    st.table(daily_stats["upload_mbps"])
-    st.table(daily_stats["ping"])
-
-    sns.set_theme()
-    st.pyplot(plot_histograms(data))
-    st.pyplot(plot_timeseries(data))
+    # st.table(daily_stats["download_mbps"])
+    # st.table(daily_stats["upload_mbps"])
+    # st.table(daily_stats["ping"])
 
     # Boxplot Timeseries
     download_by_date = [data[data.date == date].download_mbps for date in date_list]
