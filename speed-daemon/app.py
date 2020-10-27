@@ -128,6 +128,14 @@ def plot_summary(df):
     return fig
 
 
+def get_stats(df):
+    return {
+        "download_mbps": df.download_mbps.agg(["count", "median", "mean", "std"]),
+        "upload_mbps": df.upload_mbps.agg(["count", "median", "mean", "std"]),
+        "ping": df.ping.agg(["count", "median", "mean", "std"]),
+    }
+
+
 def main():
     data = load_data()
     data = parse_data(data)
@@ -135,22 +143,15 @@ def main():
     st.text(f"Analyzing {len(data)} data points over {len(date_list)} days")
 
     today = data[data.timestamp.dt.date == datetime.datetime.today().date()]
+    today_stats = get_stats(today)
+    st.table(today_stats)
     st.pyplot(plot_summary(today))
 
-    # Build stats datesets
-    download_by_date_stats = data.download_mbps.groupby(data.timestamp.dt.date).agg(
-        ["count", "median", "mean", "std"]
-    )
-    upload_by_date_stats = data.upload_mbps.groupby(data.timestamp.dt.date).agg(
-        ["count", "median", "mean", "std"]
-    )
-    ping_by_date_stats = data.ping.groupby(data.timestamp.dt.date).agg(
-        ["count", "median", "mean", "std"]
-    )
+    daily_stats = get_stats(data.groupby(data.timestamp.dt.date))
 
-    st.table(download_by_date_stats)
-    st.table(upload_by_date_stats)
-    st.table(ping_by_date_stats)
+    st.table(daily_stats["download_mbps"])
+    st.table(daily_stats["upload_mbps"])
+    st.table(daily_stats["ping"])
 
     sns.set_theme()
     st.pyplot(plot_histograms(data))
