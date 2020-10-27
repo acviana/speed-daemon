@@ -102,33 +102,64 @@ def plot_boxplot_set(download_data, upload_data, ping_data):
     return fig
 
 
-def plot_summary(df):
+def plot_scatterplot(ax, x_data, y_data, mean, std, title, y_label, x_label=None):
+    ax.plot(x_data, y_data, ".")
+    ax.axhline(mean - std, linestyle=":")
+    ax.axhline(mean)
+    ax.axhline(mean + std, linestyle=":")
+    ax.set_title(title)
+    ax.set_ylabel(y_label)
+    ax.set_xlabel(x_label)
+
+
+def plot_summary(df, stats):
     fig, axs = plt.subplots(3, 2)
     fig.tight_layout(pad=1.0)
 
-    axs[0][0].plot(df["timestamp"], df["download_mbps"], ".")
-    axs[0][0].set_title("Download Speed")
-    axs[0][0].set_ylabel("Mbps")
+    plot_scatterplot(
+        axs[0][0],
+        df["timestamp"],
+        df["download_mbps"],
+        stats["download_mbps"]["mean"],
+        stats["download_mbps"]["std"],
+        "Download Speed",
+        "Mbps",
+    )
 
-    axs[1][0].plot(df["timestamp"], df["upload_mbps"], ".")
-    axs[1][0].set_title("Upload Speed")
-    axs[1][0].set_ylabel("Mbps")
+    plot_scatterplot(
+        axs[1][0],
+        df["timestamp"],
+        df["upload_mbps"],
+        stats["upload_mbps"]["mean"],
+        stats["upload_mbps"]["std"],
+        "Upload Speed",
+        "Mbps",
+    )
 
-    axs[2][0].plot(df["timestamp"], df["ping"], ".")
-    axs[2][0].set_title("Ping")
-    axs[2][0].set_xlabel("Date")
-    axs[2][0].set_ylabel("ms")
+    plot_scatterplot(
+        axs[2][0],
+        df["timestamp"],
+        df["ping"],
+        stats["ping"]["mean"],
+        stats["ping"]["std"],
+        "Ping",
+        "ms",
+        "Date",
+    )
 
     bins = 10
 
     axs[0][1].hist(df["download_mbps"], bins=bins, orientation="horizontal")
+    axs[0][1].axhline(stats["download_mbps"]["mean"], linestyle="--")
     axs[1][1].hist(df["upload_mbps"], bins=bins, orientation="horizontal")
+    axs[1][1].axhline(stats["upload_mbps"]["mean"], linestyle="--")
     axs[2][1].hist(df["ping"], bins=bins, orientation="horizontal")
+    axs[2][1].axhline(stats["ping"]["mean"], linestyle="--")
 
     return fig
 
 
-def get_stats(df):
+def get_summary_stats(df):
     return {
         "download_mbps": df.download_mbps.agg(["count", "median", "mean", "std"]),
         "upload_mbps": df.upload_mbps.agg(["count", "median", "mean", "std"]),
@@ -142,13 +173,15 @@ def main():
     date_list = data.date.unique()
     st.text(f"Analyzing {len(data)} data points over {len(date_list)} days")
 
+    # Today Section
     today = data[data.timestamp.dt.date == datetime.datetime.today().date()]
-    today_stats = get_stats(today)
+    today_stats = get_summary_stats(today)
     st.table(today_stats)
-    st.pyplot(plot_summary(today))
+    st.pyplot(plot_summary(today, stats=today_stats))
 
-    daily_stats = get_stats(data.groupby(data.timestamp.dt.date))
+    daily_stats = get_summary_stats(data.groupby(data.timestamp.dt.date))
 
+    # Next Section
     st.table(daily_stats["download_mbps"])
     st.table(daily_stats["upload_mbps"])
     st.table(daily_stats["ping"])
