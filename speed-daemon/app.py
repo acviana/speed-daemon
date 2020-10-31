@@ -170,22 +170,29 @@ def get_summary_stats(df):
 def main():
     data = load_data()
     data = parse_data(data)
-    date_list = data.date.unique()
-    st.text(f"Analyzing {len(data)} data points over {len(date_list)} days")
     sns.set_theme()
 
+    # Scale of Data
+    date_list = data.date.unique()
+    st.text(f"Analyzing {len(data)} data points over {len(date_list)} days")
+
+    # Last Reading
+    st.subheader("Last Reading")
+    st.table(data.iloc[0][["timestamp", "download_mbps", "upload_mbps", "ping"]])
+
     # Today's Stats
+    st.subheader("Last 24 Hours")
     today = data[data.timestamp.dt.date == datetime.datetime.today().date()]
     today_stats = get_summary_stats(today)
     st.table(today_stats)
     st.pyplot(plot_summary(df=today, stats=today_stats))
 
-
     # Overall Stats
+    st.subheader("All Data")
     overall_stats = get_summary_stats(data)
+    st.table(overall_stats)
     st.pyplot(plot_summary(df=data, stats=overall_stats))
     st.pyplot(plot_histograms(data))
-
 
     daily_stats = get_summary_stats(data.groupby(data.timestamp.dt.date))
     # st.table(daily_stats["download_mbps"])
