@@ -11,6 +11,9 @@ export:
 	poetry export -f requirements.txt -o requirements.txt
 	poetry export -f requirements.txt -o requirements_dev.txt --dev
 
+install:
+	poetry install
+
 pre-commit: black build
 
 sync:
