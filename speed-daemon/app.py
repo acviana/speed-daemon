@@ -56,29 +56,33 @@ def plot_histograms(df):
     fig, axs = plt.subplots(3, 2)
     fig.tight_layout(pad=1.0)
 
-    axs[0][0].hist(df["download_mbps"], bins=bins)
-    axs[0][0].set_xlabel("Mbps")
-    axs[0][0].set_ylabel("Downloads")
+    plot_histogram(
+        ax=axs[0][0],
+        data=df["download_mbps"],
+        bins=bins,
+        y_label="Downloads",
+        x_label="Mbps",
+    )
+    plot_histogram(
+        ax=axs[1][0],
+        data=df["upload_mbps"],
+        bins=bins,
+        y_label="Upload",
+        x_label="Mbps",
+    )
+    plot_histogram(
+        ax=axs[2][0], data=df["ping"], bins=bins, y_label="Ping", x_label="ms"
+    )
 
-    axs[1][0].hist(df["upload_mbps"], bins=bins)
-    axs[1][0].set_xlabel("Mbps")
-    axs[1][0].set_ylabel("Uploads")
-
-    axs[2][0].hist(df["ping"], bins=bins)
-    axs[2][0].set_xlabel("ms")
-    axs[2][0].set_ylabel("Pings")
-
-    axs[0][1].set_yscale("log")
-    axs[0][1].hist(df["download_mbps"], bins=bins)
-    axs[0][1].set_xlabel("Mbps")
-
-    axs[1][1].set_yscale("log")
-    axs[1][1].hist(df["upload_mbps"], bins=bins)
-    axs[1][1].set_xlabel("Mbps")
-
-    axs[2][1].set_yscale("log")
-    axs[2][1].hist(df["ping"], bins=bins)
-    axs[2][1].set_xlabel("ms")
+    plot_histogram(
+        ax=axs[0][1], data=df["download_mbps"], bins=bins, x_label="Mbps", y_scale="log"
+    )
+    plot_histogram(
+        ax=axs[1][1], data=df["upload_mbps"], bins=bins, x_label="Mbps", y_scale="log"
+    )
+    plot_histogram(
+        ax=axs[2][1], data=df["ping"], bins=bins, x_label="ms", y_scale="log"
+    )
 
     return fig
 
@@ -102,9 +106,22 @@ def plot_boxplot_set(download_data, upload_data, ping_data):
     return fig
 
 
-def plot_histogram(ax, data, bins, orientation, mean):
+def plot_histogram(
+    ax,
+    data,
+    bins,
+    orientation="vertical",
+    mean=None,
+    y_label=None,
+    x_label=None,
+    y_scale="linear",
+):
     ax.hist(data, bins=bins, orientation=orientation)
-    ax.axhline(mean, linestyle="--")
+    if mean:
+        ax.axhline(mean, linestyle="--")
+    ax.set_ylabel(y_label)
+    ax.set_xlabel(x_label)
+    ax.set_yscale(y_scale)
 
 
 def plot_scatterplot(ax, x_data, y_data, mean, std, title, y_label, x_label=None):
@@ -146,7 +163,7 @@ def plot_summary(df, stats):
         mean=stats["ping"]["mean"],
         std=stats["ping"]["std"],
         title="Ping",
-        y_label= "ms",
+        y_label="ms",
         x_label="Date",
     )
 
@@ -212,9 +229,6 @@ def main():
     st.pyplot(plot_histograms(data))
 
     daily_stats = get_summary_stats(data.groupby(data.timestamp.dt.date))
-    # st.table(daily_stats["download_mbps"])
-    # st.table(daily_stats["upload_mbps"])
-    # st.table(daily_stats["ping"])
 
     # Boxplot Timeseries
     download_by_date = [data[data.date == date].download_mbps for date in date_list]
