@@ -122,34 +122,32 @@ def plot_summary(df, stats):
     fig.tight_layout(pad=1.0)
 
     plot_scatterplot(
-        axs[0][0],
-        df["timestamp"],
-        df["download_mbps"],
-        stats["download_mbps"]["mean"],
-        stats["download_mbps"]["std"],
-        "Download Speed",
-        "Mbps",
+        ax=axs[0][0],
+        x_data=df["timestamp"],
+        y_data=df["download_mbps"],
+        mean=stats["download_mbps"]["mean"],
+        std=stats["download_mbps"]["std"],
+        title="Download Speed",
+        y_label="Mbps",
     )
-
     plot_scatterplot(
-        axs[1][0],
-        df["timestamp"],
-        df["upload_mbps"],
-        stats["upload_mbps"]["mean"],
-        stats["upload_mbps"]["std"],
-        "Upload Speed",
-        "Mbps",
+        ax=axs[1][0],
+        x_data=df["timestamp"],
+        y_data=df["upload_mbps"],
+        mean=stats["upload_mbps"]["mean"],
+        std=stats["upload_mbps"]["std"],
+        title="Upload Speed",
+        y_label="Mbps",
     )
-
     plot_scatterplot(
-        axs[2][0],
-        df["timestamp"],
-        df["ping"],
-        stats["ping"]["mean"],
-        stats["ping"]["std"],
-        "Ping",
-        "ms",
-        "Date",
+        ax=axs[2][0],
+        x_data=df["timestamp"],
+        y_data=df["ping"],
+        mean=stats["ping"]["mean"],
+        std=stats["ping"]["std"],
+        title="Ping",
+        y_label= "ms",
+        x_label="Date",
     )
 
     bins = 10
