@@ -102,6 +102,11 @@ def plot_boxplot_set(download_data, upload_data, ping_data):
     return fig
 
 
+def plot_histogram(ax, data, bins, orientation, mean):
+    ax.hist(data, bins=bins, orientation=orientation)
+    ax.axhline(mean, linestyle="--")
+
+
 def plot_scatterplot(ax, x_data, y_data, mean, std, title, y_label, x_label=None):
     ax.plot(x_data, y_data, ".")
     ax.axhline(mean - std, linestyle=":")
@@ -148,13 +153,27 @@ def plot_summary(df, stats):
     )
 
     bins = 10
-
-    axs[0][1].hist(df["download_mbps"], bins=bins, orientation="horizontal")
-    axs[0][1].axhline(stats["download_mbps"]["mean"], linestyle="--")
-    axs[1][1].hist(df["upload_mbps"], bins=bins, orientation="horizontal")
-    axs[1][1].axhline(stats["upload_mbps"]["mean"], linestyle="--")
-    axs[2][1].hist(df["ping"], bins=bins, orientation="horizontal")
-    axs[2][1].axhline(stats["ping"]["mean"], linestyle="--")
+    plot_histogram(
+        ax=axs[0][1],
+        data=df["download_mbps"],
+        bins=bins,
+        orientation="horizontal",
+        mean=stats["download_mbps"]["mean"],
+    )
+    plot_histogram(
+        ax=axs[1][1],
+        data=df["upload_mbps"],
+        bins=bins,
+        orientation="horizontal",
+        mean=stats["upload_mbps"]["mean"],
+    )
+    plot_histogram(
+        ax=axs[2][1],
+        data=df["ping"],
+        bins=bins,
+        orientation="horizontal",
+        mean=stats["ping"]["mean"],
+    )
 
     return fig
 
