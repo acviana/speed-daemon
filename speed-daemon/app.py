@@ -61,6 +61,7 @@ def plot_histograms(df, stats):
         data=df["download_mbps"],
         bins=bins,
         mean=stats["download_mbps"]["mean"],
+        std=stats["download_mbps"]["std"],
         y_label="Downloads",
         x_label="Mbps",
     )
@@ -69,6 +70,7 @@ def plot_histograms(df, stats):
         data=df["upload_mbps"],
         bins=bins,
         mean=stats["upload_mbps"]["mean"],
+        std=stats["upload_mbps"]["std"],
         y_label="Upload",
         x_label="Mbps",
     )
@@ -77,6 +79,7 @@ def plot_histograms(df, stats):
         data=df["ping"],
         bins=bins,
         mean=stats["ping"]["mean"],
+        std=stats["ping"]["std"],
         y_label="Ping",
         x_label="ms",
     )
@@ -86,6 +89,7 @@ def plot_histograms(df, stats):
         data=df["download_mbps"],
         bins=bins,
         mean=stats["download_mbps"]["mean"],
+        std=stats["download_mbps"]["std"],
         x_label="Mbps",
         y_scale="log",
     )
@@ -94,6 +98,7 @@ def plot_histograms(df, stats):
         data=df["upload_mbps"],
         bins=bins,
         mean=stats["upload_mbps"]["mean"],
+        std=stats["upload_mbps"]["std"],
         x_label="Mbps",
         y_scale="log",
     )
@@ -102,6 +107,7 @@ def plot_histograms(df, stats):
         data=df["ping"],
         bins=bins,
         mean=stats["ping"]["mean"],
+        std=stats["ping"]["std"],
         x_label="ms",
         y_scale="log",
     )
@@ -134,17 +140,20 @@ def plot_histogram(
     bins,
     orientation="vertical",
     mean=None,
+    std=None,
     y_label=None,
     x_label=None,
     y_scale="linear",
 ):
     ax.hist(data, bins=bins, orientation=orientation)
-    if mean:
-        if orientation == "vertical":
-            ax.axvline(mean, linestyle="--")
-        else:
-            ax.axhline(mean, linestyle="--")
-
+    if orientation == "vertical":
+        ax.axvline(mean - std, linestyle=":")
+        ax.axvline(mean, linestyle="--")
+        ax.axvline(mean + std, linestyle=":")
+    else:
+        ax.axhline(mean - std, linestyle=":")
+        ax.axhline(mean, linestyle="--")
+        ax.axhline(mean + std, linestyle=":")
     ax.set_ylabel(y_label)
     ax.set_xlabel(x_label)
     ax.set_yscale(y_scale)
@@ -200,6 +209,7 @@ def plot_summary(df, stats):
         bins=bins,
         orientation="horizontal",
         mean=stats["download_mbps"]["mean"],
+        std=stats["download_mbps"]["std"],
     )
     plot_histogram(
         ax=axs[1][1],
@@ -207,6 +217,7 @@ def plot_summary(df, stats):
         bins=bins,
         orientation="horizontal",
         mean=stats["upload_mbps"]["mean"],
+        std=stats["upload_mbps"]["std"],
     )
     plot_histogram(
         ax=axs[2][1],
@@ -214,6 +225,7 @@ def plot_summary(df, stats):
         bins=bins,
         orientation="horizontal",
         mean=stats["ping"]["mean"],
+        std=stats["ping"]["std"],
     )
 
     return fig
