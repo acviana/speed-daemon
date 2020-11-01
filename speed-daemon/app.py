@@ -51,7 +51,7 @@ def plot_timeseries(df):
     return fig
 
 
-def plot_histograms(df):
+def plot_histograms(df, stats):
     bins = 25
     fig, axs = plt.subplots(3, 2)
     fig.tight_layout(pad=1.0)
@@ -60,6 +60,7 @@ def plot_histograms(df):
         ax=axs[0][0],
         data=df["download_mbps"],
         bins=bins,
+        mean=stats["download_mbps"]["mean"],
         y_label="Downloads",
         x_label="Mbps",
     )
@@ -67,21 +68,42 @@ def plot_histograms(df):
         ax=axs[1][0],
         data=df["upload_mbps"],
         bins=bins,
+        mean=stats["upload_mbps"]["mean"],
         y_label="Upload",
         x_label="Mbps",
     )
     plot_histogram(
-        ax=axs[2][0], data=df["ping"], bins=bins, y_label="Ping", x_label="ms"
+        ax=axs[2][0],
+        data=df["ping"],
+        bins=bins,
+        mean=stats["ping"]["mean"],
+        y_label="Ping",
+        x_label="ms",
     )
 
     plot_histogram(
-        ax=axs[0][1], data=df["download_mbps"], bins=bins, x_label="Mbps", y_scale="log"
+        ax=axs[0][1],
+        data=df["download_mbps"],
+        bins=bins,
+        mean=stats["download_mbps"]["mean"],
+        x_label="Mbps",
+        y_scale="log",
     )
     plot_histogram(
-        ax=axs[1][1], data=df["upload_mbps"], bins=bins, x_label="Mbps", y_scale="log"
+        ax=axs[1][1],
+        data=df["upload_mbps"],
+        bins=bins,
+        mean=stats["upload_mbps"]["mean"],
+        x_label="Mbps",
+        y_scale="log",
     )
     plot_histogram(
-        ax=axs[2][1], data=df["ping"], bins=bins, x_label="ms", y_scale="log"
+        ax=axs[2][1],
+        data=df["ping"],
+        bins=bins,
+        mean=stats["ping"]["mean"],
+        x_label="ms",
+        y_scale="log",
     )
 
     return fig
@@ -118,7 +140,11 @@ def plot_histogram(
 ):
     ax.hist(data, bins=bins, orientation=orientation)
     if mean:
-        ax.axhline(mean, linestyle="--")
+        if orientation == "vertical":
+            ax.axvline(mean, linestyle="--")
+        else:
+            ax.axhline(mean, linestyle="--")
+
     ax.set_ylabel(y_label)
     ax.set_xlabel(x_label)
     ax.set_yscale(y_scale)
@@ -226,7 +252,7 @@ def main():
     overall_stats = get_summary_stats(data)
     st.table(overall_stats)
     st.pyplot(plot_summary(df=data, stats=overall_stats))
-    st.pyplot(plot_histograms(data))
+    st.pyplot(plot_histograms(df=data, stats=overall_stats))
 
     daily_stats = get_summary_stats(data.groupby(data.timestamp.dt.date))
 
