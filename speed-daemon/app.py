@@ -269,12 +269,14 @@ def main():
     daily_stats = get_summary_stats(data.groupby(data.timestamp.dt.date))
 
     # Boxplot Timeseries
+    st.subheader("Data by Date")
     download_by_date = [data[data.date == date].download_mbps for date in date_list]
     upload_by_date = [data[data.date == date].upload_mbps for date in date_list]
     ping_by_date = [data[data.date == date].ping for date in date_list]
     st.pyplot(plot_boxplot_set(download_by_date, upload_by_date, ping_by_date))
 
     # Boxplot by Day of Week
+    st.subheader("Data by Day of Week")
     day_of_week_list = data.day_of_week.unique()
     download_by_day_of_week = [
         data[data.day_of_week == day_name].download_mbps
@@ -293,6 +295,7 @@ def main():
     )
 
     # Boxplot by Hour
+    st.subheader("Data by Hour")
     hour_list = data.hour_of_day.unique()
     download_by_hour = [
         data[data.hour_of_day == hour].download_mbps for hour in hour_list
