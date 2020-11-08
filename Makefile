@@ -25,8 +25,10 @@ run-container: build
 run-server:
 	streamlit run speed-daemon/app.py
 
-update:
+_update:
 	poetry update
+
+update: _update export pre-commit
 
 update-diff:
 	poetry update --dry-run | grep -i updat
