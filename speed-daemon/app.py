@@ -231,6 +231,8 @@ def plot_summary(df, stats):
         std=stats["ping"]["std"],
     )
 
+    fig.autofmt_xdate()
+
     return fig
 
 
@@ -259,6 +261,8 @@ def plot_timeseries_summary(df):
     plot_mean_median_std(axs[0], df["download_mbps"], "Download")
     plot_mean_median_std(axs[1], df["upload_mbps"], "Upload")
     plot_mean_median_std(axs[2], df["ping"], "Ping")
+
+    fig.autofmt_xdate()
 
     return fig
 
