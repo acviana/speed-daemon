@@ -118,25 +118,6 @@ def plot_histograms(df, stats):
     return fig
 
 
-def plot_boxplot_set(download_data, upload_data, ping_data):
-    fig, axs = plt.subplots(3, 1)
-    fig.tight_layout(pad=1.0)
-
-    axs[0].set_title("Download Speed")
-    axs[0].boxplot(download_data, flierprops={"marker": "x"})
-    axs[0].set_ylabel("Mbps")
-
-    axs[1].set_title("Upload Speed")
-    axs[1].boxplot(upload_data, flierprops={"marker": "x"})
-    axs[1].set_ylabel("Mbps")
-
-    axs[2].set_title("Ping")
-    axs[2].boxplot(ping_data, flierprops={"marker": "x"})
-    axs[2].set_ylabel("ms")
-
-    return fig
-
-
 def plot_histogram(
     ax,
     data,
@@ -312,11 +293,6 @@ def main():
 
     # Boxplot Timeseries
     st.subheader("Data by Date")
-    download_by_date = [data[data.date == date].download_mbps for date in date_list]
-    upload_by_date = [data[data.date == date].upload_mbps for date in date_list]
-    ping_by_date = [data[data.date == date].ping for date in date_list]
-    st.pyplot(plot_boxplot_set(download_by_date, upload_by_date, ping_by_date))
-
     st.pyplot(plot_timeseries_summary(stats_by_date))
 
     # Boxplot by Day of Week
@@ -326,35 +302,10 @@ def main():
     )
     st.pyplot(plot_timeseries_summary(stats_by_day_of_week))
 
-    day_of_week_list = data.day_of_week.unique()
-    download_by_day_of_week = [
-        data[data.day_of_week == day_name].download_mbps
-        for day_name in day_of_week_list
-    ]
-    upload_by_day_of_week = [
-        data[data.day_of_week == day_name].upload_mbps for day_name in day_of_week_list
-    ]
-    ping_by_day_of_week = [
-        data[data.day_of_week == day_name].ping for day_name in day_of_week_list
-    ]
-    st.pyplot(
-        plot_boxplot_set(
-            download_by_day_of_week, upload_by_day_of_week, ping_by_day_of_week
-        )
-    )
-
     # Boxplot by Hour
     st.subheader("Data by Hour")
     stats_by_hour_of_day = get_summary_stats(data.groupby(data.hour_of_day))
     st.pyplot(plot_timeseries_summary(stats_by_hour_of_day))
-
-    hour_list = data.hour_of_day.unique()
-    download_by_hour = [
-        data[data.hour_of_day == hour].download_mbps for hour in hour_list
-    ]
-    upload_by_hour = [data[data.hour_of_day == hour].upload_mbps for hour in hour_list]
-    ping_by_hour = [data[data.hour_of_day == hour].ping for hour in hour_list]
-    st.pyplot(plot_boxplot_set(download_by_hour, upload_by_hour, ping_by_hour))
 
 
 if __name__ == "__main__":
