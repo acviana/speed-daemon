@@ -224,6 +224,16 @@ def get_summary_stats(df, days_of_week=False):
         "ping": df.ping.agg(["count", "median", "mean", "std"]),
     }
     if days_of_week:
+
+        # TODO: Something about how dates are set up are giving this error:
+        #
+        # Using categorical units to plot a list of strings that are all
+        # parsable as floats or dates. If these strings should be
+        # plotted as numbers, cast to the appropriate data type before
+        # plotting.
+        #
+        # Reference: https://stackoverflow.com/questions/46304691/matplotlib-could-not-convert-string-to-float
+
         day_of_week_index = [
             "Monday",
             "Tuesday",
