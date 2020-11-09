@@ -236,12 +236,26 @@ def plot_summary(df, stats):
     return fig
 
 
-def get_summary_stats(df):
-    return {
+def get_summary_stats(df, days_of_week=False):
+    output = {
         "download_mbps": df.download_mbps.agg(["count", "median", "mean", "std"]),
         "upload_mbps": df.upload_mbps.agg(["count", "median", "mean", "std"]),
         "ping": df.ping.agg(["count", "median", "mean", "std"]),
     }
+    if days_of_week:
+        day_of_week_index = [
+            "Monday",
+            "Tuesday",
+            "Wednesday",
+            "Thursday",
+            "Friday",
+            "Saturday",
+            "Sunday",
+        ]
+        output["download_mbps"] = output["download_mbps"].reindex(day_of_week_index)
+        output["upload_mbps"] = output["upload_mbps"].reindex(day_of_week_index)
+        output["ping"] = output["ping"].reindex(day_of_week_index)
+    return output
 
 
 def plot_mean_median_std(ax, data, data_type):
@@ -307,7 +321,9 @@ def main():
 
     # Boxplot by Day of Week
     st.subheader("Data by Day of Week")
-    stats_by_day_of_week = get_summary_stats(data.groupby(data.day_of_week))
+    stats_by_day_of_week = get_summary_stats(
+        data.groupby(data.day_of_week), days_of_week=True
+    )
     st.pyplot(plot_timeseries_summary(stats_by_day_of_week))
 
     day_of_week_list = data.day_of_week.unique()
