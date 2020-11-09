@@ -24,7 +24,10 @@ def load_data():
 def parse_data(df):
     df["download_mbps"] = df["download"] / 1000000.0
     df["upload_mbps"] = df["upload"] / 1000000.0
-    df["timestamp"] = df["timestamp"].astype("datetime64[ns]")
+    # This is absolutely not the right way to do this.
+    df["timestamp"] = (df["timestamp"]).astype("datetime64[ns]") - datetime.timedelta(
+        hours=6
+    )
     df["date"] = df.timestamp.dt.date
     df["day_of_week"] = df.timestamp.dt.day_name()
     df["hour_of_day"] = df.timestamp.dt.hour
@@ -239,6 +242,27 @@ def get_summary_stats(df):
     }
 
 
+def plot_mean_median_std(ax, data, data_type):
+    ax.errorbar(data.index, "mean", yerr="std", marker="o", linestyle="", data=data)
+    ax.plot(data.index, "median", marker="x", linestyle="", data=data)
+    ax.set_title(data_type)
+    if data_type in ["Download", "Upload"]:
+        ax.set_ylabel("Mbps")
+    elif data_type == "Ping":
+        ax.set_ylabel("ms")
+
+
+def plot_timeseries_summary(df):
+    fig, axs = plt.subplots(3, 1)
+    fig.tight_layout(pad=1.0)
+
+    plot_mean_median_std(axs[0], df["download_mbps"], "Download")
+    plot_mean_median_std(axs[1], df["upload_mbps"], "Upload")
+    plot_mean_median_std(axs[2], df["ping"], "Ping")
+
+    return fig
+
+
 def main():
     data = load_data()
     data = parse_data(data)
@@ -266,7 +290,7 @@ def main():
     st.pyplot(plot_summary(df=data, stats=overall_stats))
     st.pyplot(plot_histograms(df=data, stats=overall_stats))
 
-    daily_stats = get_summary_stats(data.groupby(data.timestamp.dt.date))
+    stats_by_date = get_summary_stats(data.groupby(data.timestamp.dt.date))
 
     # Boxplot Timeseries
     st.subheader("Data by Date")
@@ -275,8 +299,13 @@ def main():
     ping_by_date = [data[data.date == date].ping for date in date_list]
     st.pyplot(plot_boxplot_set(download_by_date, upload_by_date, ping_by_date))
 
+    st.pyplot(plot_timeseries_summary(stats_by_date))
+
     # Boxplot by Day of Week
     st.subheader("Data by Day of Week")
+    stats_by_day_of_week = get_summary_stats(data.groupby(data.day_of_week))
+    st.pyplot(plot_timeseries_summary(stats_by_day_of_week))
+
     day_of_week_list = data.day_of_week.unique()
     download_by_day_of_week = [
         data[data.day_of_week == day_name].download_mbps
@@ -296,6 +325,9 @@ def main():
 
     # Boxplot by Hour
     st.subheader("Data by Hour")
+    stats_by_hour_of_day = get_summary_stats(data.groupby(data.hour_of_day))
+    st.pyplot(plot_timeseries_summary(stats_by_hour_of_day))
+
     hour_list = data.hour_of_day.unique()
     download_by_hour = [
         data[data.hour_of_day == hour].download_mbps for hour in hour_list

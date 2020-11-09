@@ -16,8 +16,10 @@ install:
 
 pre-commit: black build
 
-sync:
+_sync:
 	./sync.sh
+
+sync: _sync count
 
 run-container: build
 	docker container run -p 8501:8501 -d speed-daemon:latest
