@@ -1,5 +1,10 @@
 black:
-	black speed-daemon
+	black speed_daemon
+	black tests
+
+black-diff:
+	black speed_daemon --diff
+	black tests --diff
 
 build:
 	docker build -f Dockerfile --tag speed-daemon:latest .
@@ -14,7 +19,7 @@ export:
 install:
 	poetry install
 
-pre-commit: black build
+pre-commit: black test export build
 
 _sync:
 	./sync.sh
@@ -26,6 +31,9 @@ run-container: build
 
 run-server:
 	streamlit run speed-daemon/app.py
+
+test:
+	pytest -vvs --cov-report term-missing --cov=speed_daemon tests/
 
 _update:
 	poetry update
