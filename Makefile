@@ -16,10 +16,13 @@ export:
 	poetry export -f requirements.txt -o requirements.txt
 	poetry export -f requirements.txt -o requirements_dev.txt --dev
 
+flake8:
+	flake8 speed_daemon/ tests/ --statistics
+
 install:
 	poetry install
 
-pre-commit: black test export build
+pre-commit: black flake8 test export build
 
 _sync:
 	./sync.sh
@@ -30,7 +33,7 @@ run-container: build
 	docker container run -p 8501:8501 -d speed-daemon:latest
 
 run-server:
-	streamlit run speed-daemon/app.py
+	streamlit run speed_daemon/app.py
 
 test:
 	pytest -vvs --cov-report term-missing --cov=speed_daemon tests/
