@@ -5,8 +5,8 @@ install:
   - pip install -U pip
   - pip install -r requirements.txt
   - pip install -r requirements_dev.txt
-  - pip install codecov
 script:
+  - flake8 speed_daemon/ tests/ --statistics
   - pytest --cov-report term-missing --cov=speed_daemon
 after_success:
   - codecov

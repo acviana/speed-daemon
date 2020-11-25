@@ -1,5 +1,7 @@
 # speed-daemon
 
+https://travis-ci.org/acviana/speed-daemon.svg?branch=main
+
 This project is a dockerized Python [steamlit](https://www.streamlit.io/) application for exploring output JSON files from the [Speedtest CLI](https://www.speedtest.net/apps/cli).
 
 ## Collecting Data
