@@ -22,15 +22,33 @@ def load_data():
 
 
 def parse_data(df):
+    """
+    Parses the input data and enriches data.
+
+    Adds the following rows:
+        - ``download_mbps``: The ``download`` column divided by 1,000,000.
+
+    TODO
+
+    Args:
+        df (pandas.DataFrame): The input dataframe from ``load_data``.
+
+    Returns:
+        (pandas.DataFrame): An enriched and parsed dataframe.
+    """
+    # Scale data properties
     df["download_mbps"] = df["download"] / 1000000.0
     df["upload_mbps"] = df["upload"] / 1000000.0
-    # This is absolutely not the right way to do this.
-    df["timestamp"] = (df["timestamp"]).astype("datetime64[ns]") - datetime.timedelta(
-        hours=6
-    )
-    df["date"] = df.timestamp.dt.date
-    df["day_of_week"] = df.timestamp.dt.day_name()
-    df["hour_of_day"] = df.timestamp.dt.hour
+
+    # Add a timezone-aware datetime index
+    a_index = pd.DatetimeIndex(pd.to_datetime(df["timestamp"]))
+    df = df.set_index(a_index)
+    df = df.rename(columns={"timestamp": "_timestamp_string"})
+
+    # Precompute datetime groupings
+    df["date"] = df.index.date
+    df["day_of_week"] = df.index.day_name()
+    df["hour_of_day"] = df.index.hour
     return df
 
 
