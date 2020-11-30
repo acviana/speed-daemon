@@ -4,7 +4,7 @@ from pandas.testing import assert_frame_equal
 from speed_daemon.app import parse_data
 
 
-def test_parse_data():
+def test_parse_data_localization_off():
     test_data = pd.DataFrame(
         [
             {
@@ -24,6 +24,37 @@ def test_parse_data():
                 "download": 1000000,
                 "download_mbps": 1.0,
                 "hour_of_day": 3,
+                "upload": 1000000,
+                "upload_mbps": 1.0,
+            }
+        ],
+    )
+    expected_result = expected_result.set_index(
+        pd.DatetimeIndex([pd.to_datetime("2020-10-12T03:09:18.231187Z")])
+    )
+    assert_frame_equal(expected_result, test_result, check_like=True)
+
+
+def test_parse_data_localization_on():
+    test_data = pd.DataFrame(
+        [
+            {
+                "download": 1000000,
+                "timestamp": "2020-10-12T03:09:18.231187Z",
+                "upload": 1000000,
+            }
+        ]
+    )
+    test_result = parse_data(test_data, localization="US/Central")
+    expected_result = pd.DataFrame(
+        data=[
+            {
+                "_timestamp_string": "2020-10-12T03:09:18.231187Z",
+                "date": pd.to_datetime("2020-10-11").date(),
+                "day_of_week": "Sunday",
+                "download": 1000000,
+                "download_mbps": 1.0,
+                "hour_of_day": 22,
                 "upload": 1000000,
                 "upload_mbps": 1.0,
             }

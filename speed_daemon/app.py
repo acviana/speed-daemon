@@ -21,7 +21,7 @@ def load_data():
     return pd.concat(df_list, ignore_index=True)
 
 
-def parse_data(df):
+def parse_data(df, localization=None):
     """
     Parses the input data and enriches data.
 
@@ -32,6 +32,7 @@ def parse_data(df):
 
     Args:
         df (pandas.DataFrame): The input dataframe from ``load_data``.
+        localization (str): A localization string e.g. "US/East".
 
     Returns:
         (pandas.DataFrame): An enriched and parsed dataframe.
@@ -43,6 +44,9 @@ def parse_data(df):
     # Add a timezone-aware datetime index
     a_index = pd.DatetimeIndex(pd.to_datetime(df["timestamp"]))
     df = df.set_index(a_index)
+    if localization:
+        df = df.set_index(df.index.tz_convert(localization))
+
     df = df.rename(columns={"timestamp": "_timestamp_string"})
 
     # Precompute datetime groupings
