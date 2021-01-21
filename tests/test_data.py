@@ -65,6 +65,9 @@ def test_parse_data_localization_on():
     expected_result = expected_result.set_index(
         pd.DatetimeIndex([pd.to_datetime("2020-10-12T03:09:18.231187Z")])
     )
+    expected_result = expected_result.set_index(
+        expected_result.index.tz_convert("US/Central")
+    )
     assert_frame_equal(expected_result, test_result, check_like=True)
 
 
@@ -96,5 +99,8 @@ def test_parse_data_localization_on_cst():
     )
     expected_result = expected_result.set_index(
         pd.DatetimeIndex([pd.to_datetime("2020-11-12T03:09:18.231187Z")])
+    )
+    expected_result = expected_result.set_index(
+        expected_result.index.tz_convert("US/Central")
     )
     assert_frame_equal(expected_result, test_result, check_like=True)

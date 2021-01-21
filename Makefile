@@ -22,7 +22,7 @@ flake8:
 install:
 	poetry install
 
-pre-commit: black flake8 test export build
+pre-commit: black flake8 test build
 
 _sync:
 	./sync.sh
