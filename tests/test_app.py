@@ -1,7 +1,7 @@
 import pandas as pd
 from pandas.testing import assert_frame_equal
 
-from speed_daemon.app import parse_data
+from speed_daemon import data
 
 
 def test_parse_data_localization_off():
@@ -15,7 +15,7 @@ def test_parse_data_localization_off():
             }
         ]
     )
-    test_result = parse_data(test_data)
+    test_result = data.parse_data(test_data)
     expected_result = pd.DataFrame(
         data=[
             {
@@ -47,7 +47,7 @@ def test_parse_data_localization_on():
             }
         ]
     )
-    test_result = parse_data(test_data, localization="US/Central")
+    test_result = data.parse_data(test_data, localization="US/Central")
     expected_result = pd.DataFrame(
         data=[
             {
@@ -79,7 +79,7 @@ def test_parse_data_localization_on_cst():
             }
         ]
     )
-    test_result = parse_data(test_data, localization="US/Central")
+    test_result = data.parse_data(test_data, localization="US/Central")
     expected_result = pd.DataFrame(
         data=[
             {
