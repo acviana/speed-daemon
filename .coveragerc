@@ -1,0 +1,3 @@
+[run]
+omit = speed_daemon/visualize.py, /
+    speed_daemon/app.py
