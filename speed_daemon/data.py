@@ -2,10 +2,18 @@ import glob
 import json
 from json import JSONDecodeError
 
+from sqlalchemy import create_engine
 import pandas as pd
 
 
-def load_data():
+def build_database():
+    data_df = load_from_json()
+    engine = create_engine("sqlite:///database/speed-deamon.db", echo=True)
+    with engine.begin() as connection:
+        data_df.to_sql("data", con=connection, if_exists="replace")
+
+
+def load_from_json():
     df_list = []
     for filename in glob.glob("../speed-daemon/data/*.json"):
         with open(filename, "r") as f:
@@ -15,6 +23,12 @@ def load_data():
                 data = {}  # Not sure why/how this works?
             df_list.append(pd.json_normalize(data))
     return pd.concat(df_list, ignore_index=True)
+
+
+def load_from_sql():
+    engine = create_engine("sqlite:///database/speed-deamon.db", echo=True)
+    with engine.begin() as connection:
+        return pd.read_sql("data", connection)
 
 
 def parse_data(df, localization=None):

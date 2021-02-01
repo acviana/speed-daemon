@@ -13,7 +13,7 @@ from speed_daemon import (
 
 def main():
     load_and_parse_t1 = time.time()
-    data = data_tools.load_data()
+    data = data_tools.load_from_sql()
     # TODO: Made the localization a environment variable
     data = data_tools.parse_data(data, localization="US/Central")
     load_and_parse_t2 = time.time()
