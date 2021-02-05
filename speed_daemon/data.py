@@ -5,12 +5,18 @@ from json import JSONDecodeError
 from sqlalchemy import create_engine
 import pandas as pd
 
+DATABASE_URI = "sqlite:///database/speed-deamon.db"
+
+
+def write_to_db(df, table):
+    engine = create_engine(DATABASE_URI, echo=True)
+    with engine.begin() as connection:
+        df.to_sql(table, con=connection, if_exists="replace")
+
 
 def build_database():
     data_df = load_from_json()
-    engine = create_engine("sqlite:///database/speed-deamon.db", echo=True)
-    with engine.begin() as connection:
-        data_df.to_sql("data", con=connection, if_exists="replace")
+    write_to_db(data_df, "data")
 
 
 def load_from_json():
@@ -20,13 +26,13 @@ def load_from_json():
             try:
                 data = json.load(f)
             except JSONDecodeError:
-                data = {}  # Not sure why/how this works?
+                data = {}
             df_list.append(pd.json_normalize(data))
     return pd.concat(df_list, ignore_index=True)
 
 
 def load_from_sql():
-    engine = create_engine("sqlite:///database/speed-deamon.db", echo=True)
+    engine = create_engine(DATABASE_URI, echo=True)
     with engine.begin() as connection:
         return pd.read_sql("data", connection)
 
@@ -47,6 +53,11 @@ def parse_data(df, localization=None):
     Returns:
         (pandas.DataFrame): An enriched and parsed dataframe.
     """
+    # Replace NULLs with 0s where there was no connection
+    df["download"] = df["download"].fillna(0.0)
+    df["upload"] = df["upload"].fillna(0.0)
+    df["ping"] = df["ping"].fillna(0.0)
+
     # Scale data properties
     df["download_mbps"] = df["download"] / 1000000.0
     df["upload_mbps"] = df["upload"] / 1000000.0
@@ -95,3 +106,7 @@ def get_summary_stats(df, days_of_week=False):
         output["upload_mbps"] = output["upload_mbps"].reindex(day_of_week_index)
         output["ping"] = output["ping"].reindex(day_of_week_index)
     return output
+
+
+if __name__ == "__main__":
+    load_from_json()

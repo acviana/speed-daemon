@@ -16,6 +16,7 @@ def main():
     data = data_tools.load_from_sql()
     # TODO: Made the localization a environment variable
     data = data_tools.parse_data(data, localization="US/Central")
+    data_tools.write_to_db(data, "parsed_data")
     load_and_parse_t2 = time.time()
     load_and_parse_time = load_and_parse_t2 - load_and_parse_t1
     sns.set_theme()
@@ -43,7 +44,6 @@ def main():
     st.subheader("All Data")
     overall_stats = data_tools.get_summary_stats(data)
     st.table(overall_stats)
-    st.text(dir(data.index.values))
     st.pyplot(visualize.plot_summary(df=data, stats=overall_stats))
     st.pyplot(visualize.plot_histograms(df=data, stats=overall_stats))
 
