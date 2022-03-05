@@ -12,9 +12,9 @@ build:
 count:
 	find data/ -name "*.json" | wc -l
 
-export:
-	poetry export -f requirements.txt -o requirements.txt
-	poetry export -f requirements.txt -o requirements_dev.txt --dev
+export-requirements:
+	poetry export -f requirements.txt -o requirements.txt --without-hashes
+	poetry export -f requirements.txt -o requirements_dev.txt --dev --without-hashes
 
 flake8:
 	flake8 speed_daemon/ tests/ --statistics
@@ -42,6 +42,10 @@ _update:
 	poetry update
 
 update: _update export pre-commit
+
+# Checks for updated dependencies beyond the pinned Poetry versions
+update-check:
+	poetry show --outdated -v
 
 update-diff:
 	poetry update --dry-run | grep -i updat
