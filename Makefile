@@ -10,7 +10,7 @@ build:
 	docker build -f Dockerfile --tag speed-daemon:latest .
 
 count:
-	ls data/*.json | wc
+	find data/ -name "*.json" | wc -l
 
 export:
 	poetry export -f requirements.txt -o requirements.txt
