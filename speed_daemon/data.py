@@ -1,38 +1,38 @@
 import glob
 import json
-from json import JSONDecodeError
 
 from sqlalchemy import create_engine
 import pandas as pd
 
 DATABASE_URI = "sqlite:///database/speed-deamon.db"
+FILE_SEARCH_PATH = "../speed-daemon/data/*.json"
 
 
-def write_to_db(df, table):
+def write_to_db(df, database_uri, table):
     engine = create_engine(DATABASE_URI, echo=True)
     with engine.begin() as connection:
         df.to_sql(table, con=connection, if_exists="replace")
 
 
-def build_database():
-    data_df = load_from_json()
-    write_to_db(data_df, "data")
+def build_database(file_search_path, database_uri):
+    data_df = load_from_json(file_search_path=file_search_path)
+    write_to_db(df=data_df, database_uri=database_uri, table="data")
 
 
-def load_from_json():
+def load_from_json(file_search_path):
     df_list = []
-    for filename in glob.glob("../speed-daemon/data/*.json"):
+    for filename in glob.glob(file_search_path):
         with open(filename, "r") as f:
             try:
                 data = json.load(f)
-            except JSONDecodeError:
+            except json.JSONDecodeError:
                 data = {}
             df_list.append(pd.json_normalize(data))
     return pd.concat(df_list, ignore_index=True)
 
 
-def load_from_sql():
-    engine = create_engine(DATABASE_URI, echo=True)
+def load_from_sql(database_uri):
+    engine = create_engine(database_uri, echo=True)
     with engine.begin() as connection:
         return pd.read_sql("data", connection)
 
@@ -108,5 +108,9 @@ def get_summary_stats(df, days_of_week=False):
     return output
 
 
+def main():
+    build_database(file_search_path=FILE_SEARCH_PATH, database_uri=DATABASE_URI)
+
+
 if __name__ == "__main__":
-    load_from_json()
+    main()
