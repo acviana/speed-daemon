@@ -1,8 +1,11 @@
 import glob
 import json
+import logging
 
 from sqlalchemy import create_engine
 import pandas as pd
+
+logging.basicConfig(level=logging.INFO, format='%(asctime)s : %(levelname)s : %(name)s : %(message)s')
 
 
 def write_to_db(df, database_uri, table):
@@ -12,7 +15,10 @@ def write_to_db(df, database_uri, table):
 
 
 def build_database(file_search_path, database_uri, table):
+    logging.info(f"Loading data from: {file_search_path}")
     data_df = load_from_json(file_search_path=file_search_path)
+    logging.info(f"Number of files found: {len(data_df)}")
+    logging.info(f"Writing data to: {database_uri}/{table}")
     write_to_db(df=data_df, database_uri=database_uri, table=table)
 
 
