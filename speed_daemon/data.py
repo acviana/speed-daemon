@@ -4,19 +4,16 @@ import json
 from sqlalchemy import create_engine
 import pandas as pd
 
-DATABASE_URI = "sqlite:///database/speed-deamon.db"
-FILE_SEARCH_PATH = "../speed-daemon/data/*.json"
-
 
 def write_to_db(df, database_uri, table):
-    engine = create_engine(DATABASE_URI, echo=True)
+    engine = create_engine(database_uri, echo=True)
     with engine.begin() as connection:
         df.to_sql(table, con=connection, if_exists="replace")
 
 
-def build_database(file_search_path, database_uri):
+def build_database(file_search_path, database_uri, table):
     data_df = load_from_json(file_search_path=file_search_path)
-    write_to_db(df=data_df, database_uri=database_uri, table="data")
+    write_to_db(df=data_df, database_uri=database_uri, table=table)
 
 
 def load_from_json(file_search_path):
@@ -108,9 +105,16 @@ def get_summary_stats(df, days_of_week=False):
     return output
 
 
-def main():
-    build_database(file_search_path=FILE_SEARCH_PATH, database_uri=DATABASE_URI)
+def main(file_search_path, database_uri, table):
+    build_database(
+        file_search_path=file_search_path, database_uri=database_uri, table=table
+    )
 
 
 if __name__ == "__main__":
-    main()
+
+    main(
+        file_search_path="../speed-daemon/data/*.json",
+        database_uri="sqlite:///database/speed-deamon.db",
+        table="data",
+    )
