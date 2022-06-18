@@ -1,11 +1,18 @@
 import glob
 import json
 import logging
+import re
 
 from sqlalchemy import create_engine
 import pandas as pd
 
-logging.basicConfig(level=logging.INFO, format='%(asctime)s : %(levelname)s : %(name)s : %(message)s')
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s : %(levelname)s : %(name)s : %(message)s"
+)
+
+
+def write_to_csv(df, csv_filepath):
+    df.to_csv(csv_filepath)
 
 
 def write_to_db(df, database_uri, table):
@@ -15,9 +22,7 @@ def write_to_db(df, database_uri, table):
 
 
 def build_database(file_search_path, database_uri, table):
-    logging.info(f"Loading data from: {file_search_path}")
     data_df = load_from_json(file_search_path=file_search_path)
-    logging.info(f"Number of files found: {len(data_df)}")
     logging.info(f"Writing data to: {database_uri}/{table}")
     write_to_db(df=data_df, database_uri=database_uri, table=table)
 
@@ -29,7 +34,10 @@ def load_from_json(file_search_path):
             try:
                 data = json.load(f)
             except json.JSONDecodeError:
-                data = {}
+                timestamp_regex = re.compile(
+                    r"((\d{4})-(\d{2})-(\d{2})T(\d{2})\:(\d{2})\:(\d{2})Z)"
+                )
+                data = {"timestamp": timestamp_regex.search(filename)[0]}
             df_list.append(pd.json_normalize(data))
     return pd.concat(df_list, ignore_index=True)
 
@@ -111,16 +119,40 @@ def get_summary_stats(df, days_of_week=False):
     return output
 
 
-def main(file_search_path, database_uri, table):
-    build_database(
-        file_search_path=file_search_path, database_uri=database_uri, table=table
-    )
+def main(data_input_format, data_output_format, **kwargs):
+    logging.info(f"Data Input Format: {data_input_format}")
+    if data_input_format == "json":
+        logging.info(f"Loading data from: {kwargs['file_search_path']}")
+        data_df = load_from_json(file_search_path=kwargs["file_search_path"])
+    elif data_input_format == "sql":
+        logging.info(f"Loading data from: {database_uri}")
+        data_df = load_from_sql(database_uri)
+    else:
+        logging.error(f"Unrecognized Data Input Format: {data_input_format}")
+        assert False
+    logging.info(f"Number of files found: {len(data_df)}")
+
+    logging.info(f"Data Output Format: {data_output_format}")
+    if data_output_format == "csv":
+        logging.info(f"Writing Output to: {kwargs['csv_output_path']}")
+        write_to_csv(data_df, csv_filepath=kwargs["csv_output_path"])
+    elif data_output_format == "sql":
+        write_to_db(df=data_df, database_uri=database_uri, table=table)
+    else:
+        assert False
 
 
 if __name__ == "__main__":
 
     main(
+        data_input_format="json",
+        data_output_format="csv",
         file_search_path="../speed-daemon/data/*.json",
-        database_uri="sqlite:///database/speed-deamon.db",
-        table="data",
+        csv_output_path="output.csv",
     )
+
+    # main(
+    #     file_search_path="../speed-daemon/data/*.json",
+    #     database_uri="sqlite:///database/speed-deamon.db",
+    #     table="data",
+    # )
